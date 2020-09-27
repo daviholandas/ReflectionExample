@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -24,16 +27,39 @@ namespace ReflectionExample.WebApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var weathers =  Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var workSheet = workbook.AddWorksheet("WeatherForecast");
+                var currentColumn = 1;
+
+                foreach (var properties in typeof(WeatherForecast).GetProperties())
+                    workSheet.Cell(1, currentColumn++).Value = properties.Name;
+
+                workSheet.Cell(2, 1).Value = weathers.ToList();
+
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "test.xlsx");
+                }
+            }
+
+
         }
     }
 }
