@@ -43,8 +43,8 @@ namespace ReflectionExample.WebApi.Controllers
                 var workSheet = workbook.AddWorksheet("WeatherForecast");
                 var currentColumn = 1;
 
-                foreach (var properties in typeof(WeatherForecast).GetProperties())
-                    workSheet.Cell(1, currentColumn++).Value = properties.Name;
+                foreach (var property in typeof(WeatherForecast).GetProperties())
+                    workSheet.Cell(1, currentColumn++).Value = property.Name;
 
                 workSheet.Cell(2, 1).Value = weathers.ToList();
 

@@ -11,5 +11,9 @@ namespace ReflectionExample.WebApi
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
         public string Summary { get; set; }
+
+
+        private int SumOfTemperatures(int temperature1, int temperature2)
+            => temperature1 + temperature2;
     }
 }
